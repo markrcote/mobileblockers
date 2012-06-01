@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+
+<head>
+  <title>{{team_name}} Team</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/my.css" media="screen" />
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+</head>
+
+<body>
+  <div class="main">
+    <div class="uplink"><a href="index.html">up</a></div>
+    <div class="title">{{team_name}} Team:</div>
+    <table>
+      <tr>
+        {{for member in members}}
+          <td><table class="subtable">
+            <tr><td width=200><div id="memberchart_{{member.id}}"></div></td></tr>
+            <tr><td>Direct Query Links (Oldest to Latest): </td></tr>
+            <tr><td>Blockers: {{for count, url in member.bzlinks['closedblockers']}} &nbsp;<a href="{{url}}">{{count}}</a>{{endfor}}</td></tr>
+            <tr><td>Mean: {{member.stats['closedblockers']['mean']}}, Lo: {{member.stats['closedblockers']['low']}}, Hi: {{member.stats['closedblockers']['high']}}</td></tr>
+            <tr><td>Soft Blockers: {{for count, url in member.bzlinks['closedsoftblockers']}} &nbsp;<a href="{{url}}">{{count}}</a>{{endfor}}</td></tr>
+            <tr><td>Mean: {{member.stats['closedsoftblockers']['mean']}}, Lo: {{member.stats['closedsoftblockers']['low']}}, Hi: {{member.stats['closedsoftblockers']['high']}}</td></tr>
+            <tr><td>NonBlockers: {{for count, url in member.bzlinks['closednonblockers']}} &nbsp;<a href="{{url}}">{{count}}</a>{{endfor}}</td></tr>
+            <tr><td>Mean: {{member.stats['closednonblockers']['mean']}}, Lo: {{member.stats['closednonblockers']['low']}}, Hi: {{member.stats['closednonblockers']['high']}}</td></tr>
+          </table></td>
+        {{endfor}}
+      </tr>
+    </table>
+    <div class="lastupdate">last updated {{last_update}}</div>
+  </div>
+
+  <script type="text/javascript">
+    google.load("visualization", "1", {packages:["columnchart"]});
+    {{for member in members}}
+      google.setOnLoadCallback(drawColumnchart{{member.id}});
+
+      function drawColumnchart{{member.id}}() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Day');
+        data.addColumn('number', 'Blockers');
+        data.addColumn('number', 'Soft Blockers');
+        data.addColumn('number', 'Non-Blockers');
+
+        data.addRows({{len(member.rows)}});
+        {{for loop, row in looper(member.rows)}}
+            data.setValue({{loop.index}}, 0, '{{row["relative_day"]}}');
+            data.setValue({{loop.index}}, 1, {{row["closedblockers"]}});
+            data.setValue({{loop.index}}, 2, {{row["closedsoftblockers"]}});
+            data.setValue({{loop.index}}, 3, {{row["closednonblockers"]}});
+        {{endfor}}
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('memberchart_{{member.id}}'));
+        var opts = {
+          isStacked: true,
+          title: "{{member.name}} Closed",
+          legend: "bottom",
+          height: 240,
+          width: 200,
+          colors: ["red", "orange", "#87CEFA"]
+        };
+        chart.draw(data, opts);
+      }
+    {{endfor}}
+  </script>
+
+</body>
+
+</html>

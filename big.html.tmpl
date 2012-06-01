@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="refresh" content="600"> 
+    <link rel="stylesheet" type="text/css" href="css/big.css"/>
+
+    <title>Open Mobile Blockers</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div id="top"><span class="tvtext">Daily Open Mobile Blockers</span></div>
+
+      <center>
+        <div id="blockerschart" class="graphcolumnchart"></div>
+      </center>
+      <span class="tvtext">&darr; &darr; &darr; Make This Number Go Down &darr; &darr; &darr;</span>
+    </div>
+
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', {packages: ['columnchart']});
+
+      function drawVisualization() {
+        // Create and populate the data table.
+        var options = {};
+        options['allowHtml'] = true;
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Day');
+        data.addColumn('number', 'Open Blockers');
+
+        data.addRows({{len(charts[0].get_rows("2012-04-27"))}});
+        {{for loop, row in looper(charts[0].get_rows("2012-04-27"))}}
+            data.setValue({{loop.index}}, 0, '{{row["date"]}}');
+            data.setValue({{loop.index}}, 1, {{row["count"]}});
+        {{endfor}}
+          
+        new google.visualization.ColumnChart(document.getElementById("blockerschart")).draw(data, {legend: 'none', isStacked:true, height:850, min:0, colors:['red']});
+      }
+
+      google.setOnLoadCallback(drawVisualization);
+    </script>
+  </body>
+</html>

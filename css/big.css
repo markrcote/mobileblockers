@@ -1,0 +1,32 @@
+div#container {
+  text-align: center;
+  margin: 0;
+  width: 1880px;
+  height: 1060px;
+}
+
+span.tvtext {
+  font-size: 72px;
+  font-weight: bold;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+div#top {
+  padding-bottom: 16px;
+}
+
+div#blockerschart {
+  height: 850px;
+}
+
+div.graphcolumnchart {
+  width: 1880px;
+  background-color: #FFFFFF;
+}
+
+body {
+  margin: 10px;
+  background: white;
+  color: black;
+  text-align: center;
+}

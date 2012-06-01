@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+<html>
+
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+
+<head>
+  <title>Mobile Blockers</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/my.css" media="screen" />
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+</head>
+
+<body>
+  <div class="main">
+    <div class="title">Mobile Blockers</div>
+    <div class="column">
+      {{for team in teams}}
+        <div class="subtitle"><a href="{{team['url']}}">{{team['name']}}</a></div>
+      {{endfor}}
+    </div>
+    {{for chart in charts}}
+      <div class="column">
+        <table class="subtable">
+          <tr><td width=200><div id="columnchart_{{chart.id}}"></div></td></tr>
+          <tr><td>{{if chart.id == 'openblockers' or chart.id == 'opensoftblockers'}}Direct Query Link for today:{{else}}Direct Query Links (Oldest to Latest):{{endif}}</td></tr>
+          <tr><td>{{for count, url in chart.bzlinks}} &nbsp;<a href="{{url}}">{{count}}</a>{{endfor}}</td></tr>
+          <tr><td>Mean: {{chart.stats['mean']}}, Lo: {{chart.stats['low']}}, Hi: {{chart.stats['high']}}</td></tr>
+        </table>
+      </div>
+    {{endfor}}
+    <div class="clear"></div>
+    <div class="fulldata clear"><a href="mobileblockers.db">full data</a> (sqlite db)</div>
+    <div class="lastupdate clear">last updated {{last_update}}</div>
+  </div>
+
+  <script type="text/javascript">
+    google.load("visualization", "1", {packages:["columnchart"]});
+    {{for chart in charts}}
+       google.setOnLoadCallback(drawColumnchart{{chart.id}});
+
+       function drawColumnchart{{chart.id}}() {
+         var data = new google.visualization.DataTable();
+         data.addColumn('string','Days');
+         data.addColumn('number','Bugs');
+
+         data.addRows({{len(chart.rows)}});
+         {{for loop, row in looper(chart.rows)}}
+           data.setValue({{loop.index}}, 0, '{{row["relative_day"]}}');
+           data.setValue({{loop.index}}, 1, {{row["count"]}});
+         {{endfor}}
+
+         var chart = new google.visualization.ColumnChart(document.getElementById('columnchart_{{chart.id}}'));
+         var opts = {
+           isStacked: true,
+           title: "{{chart.title}}",
+           legend: 'bottom',
+           height: 240,
+           width: 200,
+           {{if chart.id == 'openblockers' or chart.id == 'closedblockers'}}
+             colors: ['red']
+           {{elif chart.id == 'opensoftblockers' or chart.id == 'closedsoftblockers'}}
+             colors: ['orange']
+           {{else}}
+             colors: ['#87CEFA']
+           {{endif}}
+         };
+         chart.draw(data, opts);
+       }
+    {{endfor}}
+  </script>
+
+</body>
+
+</html>
+
